@@ -1,0 +1,117 @@
+//SRTF algo
+#include <iostream>
+#include <climits>
+using namespace std;
+
+struct process
+{
+    int at,bt,p_id,rt,wt,tat,ct;
+};
+
+int main() 
+{
+  int n,i;
+  cout << "Enter Number of Processes" << endl;
+  cin >> n;
+  process p[10];
+  for (i=0;i<=n-1;i++)
+  {
+    p[i].p_id = i;
+    cout << "\nEnter Arrival Time of Process " << i << endl; 
+    cin >> p[i].at;
+    cout << "Enter Burst Time of Process " << i << endl;
+    cin >> p[i].bt;
+  }
+
+  int j;      //burst sort algo to sort by AT, swap function described at end of program 
+  for (i=0;i<=n-1;i++)
+  {
+    for (j=0;j<n-1;j++)
+    {
+      if (p[j].at > p[j+1].at)
+      {
+        swap(p[j].at,p[j+1].at);
+        swap(p[j].bt,p[j+1].bt);
+        swap(p[j].p_id,p[j+1].p_id);
+      }
+    }
+  }
+
+  for (i=0;i<=n-1;i++)
+    p[i].rt = p[i].bt;
+
+  int complete = 0, timer = 0, minm = INT_MAX;
+  int shortest = 0, ctime;
+  bool check = false;
+
+  while (complete != n) 
+  {
+        for (int j = 0; j < n; j++) 
+        {
+            if ((p[j].at <= timer) &&
+            (p[j].rt < minm) && p[j].rt > 0) {
+                minm = p[j].rt;
+                shortest = j;
+                check = true;
+            }
+        }
+ 
+        if (check == false) {
+            timer++;
+            continue;
+        }
+ 
+        // Reduce remaining time by one
+        p[shortest].rt--;
+ 
+        // Update minimum
+        minm = p[shortest].rt;
+        if (minm == 0)
+            minm = INT_MAX;
+ 
+        // If a process gets completely
+        // executed
+        if (p[shortest].rt == 0) {
+ 
+            // Increment complete
+            complete++;
+            check = false;
+ 
+            // Find finish time of current
+            // process 
+            ctime = timer + 1;
+ 
+            // Calculate waiting time
+            p[shortest].wt = ctime - p[shortest].bt - p[shortest].at;
+ 
+            if (p[shortest].wt < 0)
+                p[shortest].wt = 0;
+        }
+        // Increment time
+     timer++;
+    }
+
+    for(i=0;i<=n-1;i++)
+    {
+        p[i].tat = p[i].wt + p[i].bt;
+    }
+
+    for(i=0;i<=n-1;i++)
+       p[i].ct = p[i].tat + p[i].at;
+
+
+
+    cout << "\nFinal Scheduling Table (using SRTF algo) is:-\n";
+    cout << "P\tAT\tBT\tCT\tTAT\tWT" << endl;
+    for (i=0;i<=n-1;i++)
+        cout << p[i].p_id << "\t" << p[i].at << "\t" << p[i].bt << "\t" << p[i].ct << "\t" << p[i].tat << "\t" << p[i].wt << endl; 
+
+
+}
+
+void swap(int *xp, int *yp) 
+{ 
+    int temp = *xp; 
+    *xp = *yp; 
+    *yp = temp; 
+} 
