@@ -1,0 +1,127 @@
+//Round Robin algo
+#include <iostream>
+#include <climits>
+#include <queue>
+#include <algorithm>
+using namespace std;
+
+struct process
+{
+  int at,bt,p_id,ct,wt,tat,start,rem_bt;
+};
+
+
+int main() 
+{
+  process p[10];
+  int n,index,time_quantum;
+  queue <int> ready_queue;
+  bool selected[10]={false},first_process = true;
+  cout << "Enter Number of Processes" << endl;
+  cin >> n;
+  cout << "Enter Time Quantum" << endl;
+  cin >> time_quantum;
+
+  for (int i=0;i<=n-1;i++)
+  {
+    p[i].p_id = i;
+    cout << "\nEnter Arrival Time of Process " << i << endl; 
+    cin >> p[i].at;
+    cout << "Enter Burst Time of Process " << i << endl;
+    cin >> p[i].bt;
+    p[i].rem_bt = p[i].bt;
+  }
+
+  int j;      //burst sort algo to sort by AT, swap function described at end of program 
+  for (int i=0;i<=n-1;i++)
+  {
+    for (j=0;j<n-1;j++)
+    {
+      if (p[j].at > p[j+1].at)
+      {
+        swap(p[j].at,p[j+1].at);
+        swap(p[j].bt,p[j+1].bt);
+        swap(p[j].p_id,p[j+1].p_id);
+        swap(p[j].rem_bt,p[j+1].rem_bt);
+      }
+    }
+    
+  }
+
+  ready_queue.push(0);
+  selected[0] = true;
+  int count = 0,completed = 0,total_idle_time=0;
+  while(completed!=n)
+  {
+      index = ready_queue.front();
+      ready_queue.pop();
+      if(p[index].rem_bt == p[index].bt)
+      {
+          p[index].start = max(count,p[index].at);
+          total_idle_time += (first_process == true) ? 0 : p[index].start - count;
+          count =  p[index].start;
+          first_process = false;
+      }
+
+      if(p[index].rem_bt > time_quantum)
+      {
+          p[index].rem_bt -= time_quantum;
+          count += time_quantum;
+      }
+
+      else{
+          count += p[index].rem_bt;
+          p[index].rem_bt = 0;
+          completed++;
+
+          p[index].ct = count;
+          p[index].tat = p[index].ct - p[index].at;
+          p[index].wt = p[index].tat - p[index].bt;
+      }
+         
+      for(int i = 1; i < n; i++) 
+      {
+          if(p[i].rem_bt > 0 && p[i].at <= count && selected[i] == false) 
+          {
+            ready_queue.push(i);
+            selected[i] = true;
+          }
+      }
+      //check if Process on CPU needs to be pushed to Ready Queue
+      if( p[index].rem_bt> 0) 
+          ready_queue.push(index);
+            
+      //if queue is empty, just add one process from list, whose remaining burst time > 0
+      if(ready_queue.empty())
+      {
+          for(int i = 1; i < n; i++)
+          {
+            if(p[i].rem_bt > 0)
+            {
+              ready_queue.push(i);
+              selected[i] = true;
+              break;
+            }
+          }
+      }
+    
+   
+  }
+
+
+  cout << "\nFinal Scheduling Table (using Round Robin algo) is:-\n";
+  cout << "P\tAT\tBT\tCT\tTAT\tWT" << endl;
+  for (int i=0;i<=n-1;i++)
+  {
+    cout << p[i].p_id << "\t" << p[i].at << "\t" << p[i].bt << "\t" << p[i].ct << "\t" << p[i].tat << "\t" << p[i].wt << endl; 
+  }
+
+} 
+
+
+void swap(int *xp, int *yp) 
+  { 
+    int temp = *xp; 
+    *xp = *yp; 
+    *yp = temp; 
+  } 
