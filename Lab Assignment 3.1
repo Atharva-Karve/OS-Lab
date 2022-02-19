@@ -1,0 +1,64 @@
+#FCFS algo
+#include <iostream>
+using namespace std;
+int main() 
+{
+  int n,i;
+  int at[10],bt[10],p[10];   //process array is to keep the process numbers connected with corresponding at and bt
+  cout << "Enter Number of Processes" << endl;
+  cin >> n;
+  for(i=0;i<=n-1;i++)
+  {
+    p[i] = i;
+  }
+  for (i=0;i<=n-1;i++)
+  {
+    cout << "\nEnter Arrival Time of Process " << i << endl; 
+    cin >> at[i];
+    cout << "Enter Burst Time of Process " << i << endl;
+    cin >> bt[i];
+  }
+
+  int j;      //burst sort algo, swap function described at end of program 
+  for (i=0;i<=n-1;i++)
+  {
+    for (j=0;j<n-1;j++)
+    {
+      if (at[j] > at[j+1])
+      {
+        swap(at[j],at[j+1]);
+        swap(bt[j],bt[j+1]);
+        swap(p[j],p[j+1]);
+      }
+    }
+  }
+//calculation of CT, TAT and WT
+  int ct[10],tat[10],wt[10];
+  ct[0] = at[0] + bt[0];
+  for(i=1;i<=n-1;i++)
+  {
+    ct[i]= ct[i-1] + bt[i];
+  }
+  for(i=0;i<=n-1;i++)
+  {
+    tat[i] = ct[i] - at[i];
+    wt[i] = tat[i] - bt[i];
+  }
+  
+  cout << "\nFinal Scheduling Table (using FCFS algo) is:-\n";
+  cout << "P\tAT\tBT\tCT\tTAT\tWT" << endl;
+  for (i=0;i<=n-1;i++)
+  {
+    cout << p[i] << "\t" << at[i] << "\t" << bt[i] << "\t" << ct[i] << "\t" << tat[i] << "\t" << wt[i] << endl; 
+  }
+
+}
+
+void swap(int *xp, int *yp) 
+{ 
+    int temp = *xp; 
+    *xp = *yp; 
+    *yp = temp; 
+} 
+
+
