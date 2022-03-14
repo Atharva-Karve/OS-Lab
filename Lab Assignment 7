@@ -1,0 +1,98 @@
+// Bankers Safe State Algo
+#include <iostream>
+#include <cstring>
+using namespace std;
+
+struct banker
+{
+   int ta_1,ta_2,ta_3;   //total instances
+   int al_1[10],al_2[10],al_3[10];   //allocation of res 1,2,3
+   int ma_1[10],ma_2[10],ma_3[10];   //max req of res 1,2,3 p's may req
+   int need_1[10],need_2[10],need_3[10];  //need matrix calc (max - allocation) 
+   string finish[10];
+   int safe_seq[10];
+};
+int main()
+{
+    struct banker B;                               
+    int n;          //n = number of processes
+    int work_1,work_2,work_3;
+    int m=3;        //m = number of resources
+    cout << "Enter number of processes:\n" ;
+    cin >> n;
+    
+    cout << "Enter total instances of resource 1:" << endl;
+    cin >> B.ta_1;
+    cout << "Enter total instances of resource 2:" << endl;
+    cin >> B.ta_2;
+    cout << "Enter total instances of resource 3:" << endl;
+    cin >> B.ta_3;
+
+    int sum_al1=0,sum_al2=0,sum_al3=0;   //to find work matrix
+    for (int i=0;i<n;i++)  //input of alloc and max matrix
+        {
+            cout << "Enter Allocations of Resource 1 for Process " << i+1 << endl;
+            cin >> B.al_1[i];
+            sum_al1 = sum_al1 + B.al_1[i];
+            cout << "Enter Allocations of Resource 2 for Process " << i+1 << endl;
+            cin >> B.al_2[i];
+            sum_al2 = sum_al2 + B.al_2[i];
+            cout << "Enter Allocations of Resource 3 for Process " << i+1 << endl;
+            cin >> B.al_3[i];
+            sum_al3 = sum_al3 + B.al_3[i];
+            cout << "Enter Maximum Requirement of Resource 1 for Process " << i+1 << endl;
+            cin >> B.ma_1[i];
+            cout << "Enter Maximum Requirement of Resource 2 for Process " << i+1 << endl;
+            cin >> B.ma_2[i];
+            cout << "Enter Maximum Requirement of Resource 3 for Process " << i+1 << endl;
+            cin >> B.ma_3[i];
+
+            //need matrix calculated
+            B.need_1[i] = B.ma_1[i] - B.al_1[i];
+            B.need_2[i] = B.ma_2[i] - B.al_2[i];
+            B.need_3[i] = B.ma_3[i] - B.al_3[i];
+            B.finish[i] = "False";
+        }
+    //work matrix
+    work_1 = B.ta_1 - sum_al1;
+    work_2 = B.ta_2 - sum_al2;
+    work_3 = B.ta_3 - sum_al3;
+
+
+    //safe state algo
+    int k=0,flag;
+    while(k!=n)
+        {
+          for (int j=0; j<n ; j++)
+            {
+                    flag = 0;
+                    if (B.finish[j] == "False" && B.need_1[j] <= work_1 && B.need_2[j] <= work_2 && B.need_3[j] 
+                         <= work_3)
+                        {
+                            flag = 1;
+                            B.finish[j] = "True";
+                            work_1 = work_1 + B.al_1[j];
+                            work_2 = work_2 + B.al_2[j];
+                            work_3 = work_3 + B.al_3[j];
+                            B.safe_seq[k] = j ;
+                            k++;    
+                        }
+                                
+                }
+            if (flag==0)
+            {
+                cout << "System is in unsafe state" << endl;
+                break;
+            }
+               
+        }
+  
+    cout << work_1 << "  " << work_2 << "  " << work_3 << endl ;
+    cout << "The Safe Sequence is: ";
+    for (int i = 0; i<n ; i++ )
+        {
+            cout << "P" << B.safe_seq[i] << "  ";
+        }
+    
+
+}
