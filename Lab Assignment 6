@@ -1,0 +1,81 @@
+//reader writer
+#include <iostream>
+using namespace std;
+char c;
+int x = 1, mutex_lock = 1, read_count=0;   //semaphores: mutex_lock-binary semaphore to avoid reader-writer conflict; x - (reader) binary lock ; read_count- counting number of readers
+
+void reader_in()
+{  
+    x--;   //reader temp lock
+    read_count++;
+    if (read_count == 1)
+        mutex_lock--;
+    x++;
+    cout << "Reader " << read_count << " is viewing file." << endl;
+  
+}
+
+void reader_out()
+{
+    x--;
+    read_count--;
+    if (read_count == 0)
+        mutex_lock++;
+    x++;
+    cout << "Reader is no longer accessing file." << endl;
+    
+}
+void writer()
+{
+      if (mutex_lock==0)
+          cout << "Writer cannot enter into process as reader is working." << endl;
+      else
+      {
+          mutex_lock--;
+          cout << "Writer is updating file." << endl ;
+          mutex_lock++;
+      }
+}
+
+int main()
+{
+    char choice;
+    int j;
+    for(j=0;j<10;j++)
+    {
+    cout << "\nEnter R to Read ; W to Write ; TW to Test Writer-Writer condition ; TR to Test Reader-Writer condition ; RR to Test Reader-Reader condition \n";
+    cin >> choice ;
+    switch (choice)
+    {
+        case 'R': reader_in();
+                  break;
+        case 'W': reader_out();
+                  writer();
+                  break;
+        case 'TW': 
+            if (mutex_lock==0)
+               cout << "Writer cannot enter into process as reader is working." << endl;
+            else
+            {
+              mutex_lock--;
+              cout << "Writer is updating file." << endl ;
+              cout << "Try writing when writer is already present: " << endl;
+              cin >> c;
+              if (mutex_lock==0 && c == 'W')
+              cout << "Mutex Semaphore locked, writing not possible!\n" ;
+              mutex_lock++;
+            }
+
+        case 'TR': reader_in();
+                   writer();
+                   break;
+
+        case 'RR': int i;
+                   cout << "Enter number of readers to test\n";
+                   cin >> i;
+                   for(int k = 0 ; k<i ; k++)
+                       reader_in();
+    }
+     }
+        
+}
